@@ -17,7 +17,7 @@ public class Envio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long idVenta;
+    private long idVenta;
     private String direccionEnvio;
     private String estadoEnvio;
     private LocalDate fechaEnvio;
