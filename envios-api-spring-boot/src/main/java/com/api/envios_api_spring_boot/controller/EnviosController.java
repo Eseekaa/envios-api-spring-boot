@@ -1,7 +1,7 @@
 package com.api.envios_api_spring_boot.controller;
 
 import com.api.envios_api_spring_boot.model.Envio;
-import com.api.envios_api_spring_boot.EnviosService;
+import com.api.envios_api_spring_boot.service.EnviosService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.api.envios_api_spring_boot;
+package com.api.envios_api_spring_boot.service;
 
 import com.api.envios_api_spring_boot.model.Envio;
 import com.api.envios_api_spring_boot.repository.EnviosRepository;
