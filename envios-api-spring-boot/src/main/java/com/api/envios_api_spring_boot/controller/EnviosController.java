@@ -33,9 +33,8 @@ public class EnviosController {
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<EnvioDTO> actualizarEstadoEnvio(@PathVariable Integer id, @RequestBody EstadoDTO estadoDTO) {
-        EnvioDTO envioActualizado = enviosService.actualizarEstadoEnvio(id, estadoDTO.getIdEstadoEnvio());
-        return ResponseEntity.ok(envioActualizado);
-    }
+    return ResponseEntity.ok(enviosService.actualizarEstadoEnvio(id, estadoDTO.getIdEstadoEnvio()));
+    }   
 
     @PutMapping("/{id}")
     public ResponseEntity<EnvioDTO> actualizarEnvio(@PathVariable Integer id, @RequestBody EnvioDTO dto) {
@@ -47,4 +46,9 @@ public class EnviosController {
         enviosService.eliminarEnvio(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{id}/estado")
+    public ResponseEntity<EnvioDTO> obtenerEstadoEnvio(@PathVariable Integer id) {
+    EnvioDTO envio = enviosService.buscarEnvio(id);
+    return ResponseEntity.ok(envio);
+}
 }
