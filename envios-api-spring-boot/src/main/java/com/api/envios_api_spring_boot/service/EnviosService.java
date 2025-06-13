@@ -20,7 +20,7 @@ public class EnviosService {
     @Autowired
     private EstadoEnvioRepository estadoEnvioRepository;
 
-    private Envio toEntity(EnvioDTO dto) {
+    public Envio toEntity(EnvioDTO dto) {
         Envio envio = new Envio();
         envio.setId(dto.getId() != null ? dto.getId() : null); // Permitir ID nulo para creación
         envio.setIdVenta(dto.getIdVenta());
@@ -39,7 +39,7 @@ public class EnviosService {
         return envio;
     }
 
-    private EnvioDTO toDto(Envio envio) {
+    public EnvioDTO toDto(Envio envio) {
         return new EnvioDTO(
                 envio.getId(),
                 envio.getIdVenta(),
