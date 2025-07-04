@@ -1,13 +1,15 @@
 package com.api.envios_api_spring_boot.controller;
 
 import com.api.envios_api_spring_boot.dto.EnvioDTO;
-import com.api.envios_api_spring_boot.dto.EstadoDTO;
 import com.api.envios_api_spring_boot.service.EnviosService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/envios")
@@ -17,38 +19,53 @@ public class EnviosController {
     private EnviosService enviosService;
 
     @PostMapping
-    public ResponseEntity<EnvioDTO> crearEnvio(@RequestBody EnvioDTO dto) {
-        return ResponseEntity.ok(enviosService.crearEnvio(dto));
+    public ResponseEntity<EntityModel<EnvioDTO>> crearEnvio(@RequestBody EnvioDTO dto) {
+        if (dto.getId() != null) {
+            return ResponseEntity.badRequest().build();
+        }
+        EnvioDTO createdDto = enviosService.crearEnvio(dto);
+        EntityModel<EnvioDTO> resource = EntityModel.of(createdDto);
+        resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).obtenerHATEOAS(createdDto.getId())).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).obtenerTodosHATEOAS()).withRel("todos"));
+        resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).eliminar(createdDto.getId())).withRel("eliminar"));
+        return ResponseEntity.ok(resource);
     }
 
     @GetMapping
-    public ResponseEntity<List<EnvioDTO>> listarEnvios() {
-        return ResponseEntity.ok(enviosService.listarEnvios());
+    public ResponseEntity<List<EntityModel<EnvioDTO>>> listarEnvios() {
+        List<EnvioDTO> dtos = enviosService.listarEnvios();
+        List<EntityModel<EnvioDTO>> resources = dtos.stream()
+                .map(dto -> EntityModel.of(dto)
+                        .add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).obtenerHATEOAS(dto.getId())).withSelfRel()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(resources);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EnvioDTO> obtenerEnvio(@PathVariable Integer id) {
-        return ResponseEntity.ok(enviosService.buscarEnvio(id));
+    @GetMapping("/hateoas/{id}")
+    public ResponseEntity<EntityModel<EnvioDTO>> obtenerHATEOAS(@PathVariable Integer id) {
+        EnvioDTO dto = enviosService.buscarEnvio(id);
+        EntityModel<EnvioDTO> resource = EntityModel.of(dto);
+        resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).obtenerHATEOAS(id)).withSelfRel());
+        resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).obtenerTodosHATEOAS()).withRel("todos"));
+        resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).eliminar(id)).withRel("eliminar"));
+        return ResponseEntity.ok(resource);
     }
 
-    @PutMapping("/{id}/estado")
-    public ResponseEntity<EnvioDTO> actualizarEstadoEnvio(@PathVariable Integer id, @RequestBody EstadoDTO estadoDTO) {
-    return ResponseEntity.ok(enviosService.actualizarEstadoEnvio(id, estadoDTO.getIdEstadoEnvio()));
-    }   
-
-    @PutMapping("/{id}")
-    public ResponseEntity<EnvioDTO> actualizarEnvio(@PathVariable Integer id, @RequestBody EnvioDTO dto) {
-        return ResponseEntity.ok(enviosService.actualizarEnvio(id, dto));
+    @GetMapping("/hateoas")
+    public ResponseEntity<List<EntityModel<EnvioDTO>>> obtenerTodosHATEOAS() {
+        List<EnvioDTO> lista = enviosService.listarEnvios();
+        List<EntityModel<EnvioDTO>> resources = lista.stream()
+                .map(dto -> EntityModel.of(dto)
+                        .add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EnviosController.class).obtenerHATEOAS(dto.getId())).withSelfRel()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(resources);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarEnvio(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         enviosService.eliminarEnvio(id);
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("/{id}/estado")
-    public ResponseEntity<EnvioDTO> obtenerEstadoEnvio(@PathVariable Integer id) {
-    EnvioDTO envio = enviosService.buscarEnvio(id);
-    return ResponseEntity.ok(envio);
-}
+
+    // Otros métodos (buscar, actualizar) pueden añadirse si los necesitas
 }

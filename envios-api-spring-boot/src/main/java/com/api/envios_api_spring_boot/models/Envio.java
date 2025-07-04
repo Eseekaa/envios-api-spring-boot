@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "envio")
@@ -20,11 +21,12 @@ public class Envio {
 
     private Integer idVenta;
     private String direccionEnvio;
+    
 
     @ManyToOne
     @JoinColumn(name = "id_estado_envio")
     private EstadoEnvio estadoEnvio;
 
-    private LocalDate fechaEnvio;
-    private LocalDate fechaEntrega;
+    private LocalDateTime fechaEnvio;
+    private LocalDateTime fechaEntrega;
 }
